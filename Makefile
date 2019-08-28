@@ -1,5 +1,8 @@
 shell := bash
 
+deps:
+	dep ensure
+
 build:
 	go build -o ./out/nexus-minimal ./internal
 

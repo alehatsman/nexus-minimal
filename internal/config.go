@@ -1,20 +1,23 @@
 package main
 
 import (
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func initConfig() {
+	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
+		viper.SetConfigFile(configPath)
+		return
+	}
+
 	viper.SetConfigName("config")
 	viper.AddConfigPath("/etc/nexus-minimal/")
 	viper.AddConfigPath("$HOME/.nexus-minimal")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Warn("error during reading config file")
-	}
 }
 
 type HttpConfig struct {
@@ -43,6 +46,11 @@ type Config struct {
 
 func NewConfig() Config {
 	initConfig()
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Warn("error during reading config file")
+	}
 
 	config := Config{}
 	config.HTTP.Address = viper.GetString("http.addr")
